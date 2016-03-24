@@ -1,14 +1,9 @@
 
-import java.util.Iterator;
+import com.datastax.driver.core.*;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.QueryOptions;
-import com.datastax.driver.core.RegularStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 public class CreateTable {
     public static void main(String[] args) {
@@ -16,36 +11,37 @@ public class CreateTable {
         Cluster cluster = Cluster.builder().addContactPoint("10.2.3.12").build();
         Session session = cluster.connect();
 
+
         session.execute("CREATE KEYSPACE mykeyspace WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };");
-        session.execute("USE mykeyspace;");
+        Session kpSession = cluster.connect("mykeyspace");
 
-        session.execute("CREATE TABLE simplex.songs (id uuid PRIMARY KEY,title text,album text,"
-                + "artist text,tags set<text>,data blob);");
-        session.execute("CREATE TABLE simplex.playlists (id uuid,title text,album text, "
-                + "artist text,song_id uuid,PRIMARY KEY (id, title, album, artist));");
 
-        session.execute("INSERT INTO simplex.songs (id, title, album, artist, tags) VALUES ("
-                + "756716f7-2e54-4715-9f00-91dcbea6cf50,'La Petite Tonkinoise','Bye Bye Blackbird',"
-                + "'Joséphine Baker',{'jazz', '2013'});");
-        session.execute("INSERT INTO simplex.playlists (id, song_id, title, album, artist) VALUES ("
-                + "2cc9ccb7-6221-4ccb-8387-f22b6a1b354d,756716f7-2e54-4715-9f00-91dcbea6cf50,"
-                + "'La Petite Tonkinoise','Bye Bye Blackbird','Joséphine Baker');");
+        try {
+            InputStream r = new FileInputStream("bigdata_setup1.sql");
+            ByteArrayOutputStream byteout = new ByteArrayOutputStream();
+            byte tmp[] = new byte[256];
+            byte context[];
+            int i = 0;
+            while ((i = r.read(tmp)) != -1) {
+                byteout.write(tmp);
+            }
+            context = byteout.toByteArray();
+            String str = new String(context, "UTF-8");
 
-        ResultSet results = session.execute("SELECT * FROM simplex.playlists "
-                + "WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;");
-        // + "WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;");
-        System.out.println(String.format("%-30s\t%-20s\t%-20s\n%s", "title", "album", "artist",
-                "-------------------------------+-----------------------+--------------------"));
-        for (Row row : results) {
-            System.out.println(String.format("%-30s\t%-20s\t%-20s", row.getString("title"), row.getString("album"),
-                    row.getString("artist")));
+            kpSession.execute(str);
+        } catch (Exception e) {
+            System.out.println("Error: Creating table fails");
         }
-        System.out.println();
-        session.execute("DROP KEYSPACE simplex;");
+
+        kpSession.close();
+        session.close();
         cluster.close();
     }
 
 
+
+
+    /*
     public static void main(String[] args) {
         QueryOptions options = new QueryOptions();
         options.setConsistencyLevel(ConsistencyLevel.QUORUM);
@@ -59,7 +55,6 @@ public class CreateTable {
         Session session = cluster.connect();
         session.execute("CREATE KEYSPACE kp WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };");
 
-        // 针对keyspace的session，后面表名前面不用加keyspace
         Session kpSession = cluster.connect("kp");
 
 
@@ -88,13 +83,27 @@ public class CreateTable {
             System.out.println("b=" + row.getInt("b"));
             System.out.println("c=" + row.getInt("c"));
         }
+
+
+        //~~~~~~~~~~
+        ResultSet results = session.execute("SELECT * FROM simplex.playlists "
+                + "WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;");
+        // + "WHERE id = 2cc9ccb7-6221-4ccb-8387-f22b6a1b354d;");
+        System.out.println(String.format("%-30s\t%-20s\t%-20s\n%s", "title", "album", "artist",
+                "-------------------------------+-----------------------+--------------------"));
+        for (Row row : results) {
+            System.out.println(String.format("%-30s\t%-20s\t%-20s", row.getString("title"), row.getString("album"),
+                    row.getString("artist")));
+        }
+        System.out.println();
+        //~~~~~~~~~~~~
+
         kpSession.close();
         session.close();
         cluster.close();
     }
 
-    public String createTableStatement(){
-        
-    }
+
+    */
 
 }
