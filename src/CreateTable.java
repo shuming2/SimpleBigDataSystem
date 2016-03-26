@@ -1,5 +1,7 @@
 
 import com.datastax.driver.core.*;
+import com.datastax.driver.core.Cluster;
+
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -8,7 +10,9 @@ import java.io.InputStream;
 public class CreateTable {
     public static void main(String[] args) {
 
-        Cluster cluster = Cluster.builder().addContactPoint("10.2.3.12").build();
+        //Cluster cluster = Cluster.builder().withPort(9201).addContactPoint("10.2.3.12").build();
+        Cluster cluster = Cluster.builder().withPort(9201).addContactPoint("162.246.157.170").build();
+
         Session session = cluster.connect();
 
 
