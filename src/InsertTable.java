@@ -12,7 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class InsertTable {
-    public static void main(String[] args) {
+    private Map<String, String> columns;
+    public void main(String[] args) {
         String str ="";
         Cluster cluster = Cluster.builder().addContactPoint("10.2.3.12").build();
         Session session = cluster.connect();
@@ -41,7 +42,7 @@ public class InsertTable {
         }
 
 
-        Map<String, String> columns = getColumns(str);
+        columns = getColumns(str);
 
 
         kpSession.close();
@@ -50,7 +51,7 @@ public class InsertTable {
     }
 
 
-    private static Map<String, String> getColumns (String str) {
+    public Map<String, String> getColumns (String str) {
         Map<String, String> map = new LinkedHashMap<>();
 
 
@@ -73,7 +74,8 @@ public class InsertTable {
         return map;
     }
 
-    //insert
+    //INSERT INTO test.user(username,first,last) VALUES ('jdoe','John','Doe');
+
     private String populate(Map<String, String> columns) {
         for(String key: columns.keySet()) {
             if (columns.get(key).equals("int")) {

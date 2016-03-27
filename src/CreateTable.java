@@ -1,13 +1,12 @@
 
-import com.datastax.driver.core.*;
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
 
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.util.*;
+
 
 public class CreateTable {
     public static void main(String[] args) {
