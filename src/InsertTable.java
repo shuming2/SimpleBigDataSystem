@@ -73,9 +73,12 @@ public class InsertTable {
         return map;
     }
 
+    //insert
     private String populate(Map<String, String> columns) {
         for(String key: columns.keySet()) {
+            if (columns.get(key).equals("int")) {
 
+            }
         }
 
 

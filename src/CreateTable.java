@@ -13,8 +13,8 @@ public class CreateTable {
     public static void main(String[] args) {
         String create = "";
 
-        Cluster cluster = Cluster.builder().withPort(9101).addContactPoint("10.2.2.143").build();
-        //Cluster cluster = Cluster.builder().withPort(9201).addContactPoint("162.246.157.170").build();
+        //Cluster cluster = Cluster.builder().withPort(9101).addContactPoint("10.2.2.143").build();
+        Cluster cluster = Cluster.builder().withPort(9101).addContactPoint("162.246.157.170").build();
 
         Session session = cluster.connect();
 
